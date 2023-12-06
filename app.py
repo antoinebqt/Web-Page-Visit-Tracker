@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from psycopg2 import connect
 from redis import StrictRedis
 
+
 app = Flask(__name__)
 
 # Configuration de la base de données client (PostgreSQL)
@@ -17,9 +18,30 @@ client_db_cursor = client_db_conn.cursor()
 # Configuration de la base de données du compteur de page (Redis)
 page_counter_db = StrictRedis(host='redis-master.default.svc.clustr.local', port=6379, db=0)
 
-@app.route('/healthz')
-def healthz():
-    return jsonify({"status": "ok"})
+
+@app.route('/createTable')
+def createTable():
+    try:
+        # Define the SQL query to create a table
+        create_table_query = '''
+            CREATE TABLE IF NOT EXISTS clients (
+                                       id SERIAL PRIMARY KEY,
+                                       url VARCHAR(255) NOT NULL
+            );
+        '''
+
+        # Execute the query to create the table
+        client_db_cursor.execute(create_table_query)
+
+        # Commit the changes to the database
+        client_db_conn.commit()
+
+        return jsonify({"message": "Table created successfully!"}), 200
+
+    except Exception as e:
+        # Handle any exceptions that might occur during the table creation
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route('/track', methods=['POST'])
 def track_page_visit():
