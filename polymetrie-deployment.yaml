@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: polymetrie
+  labels:
+    app: polymetrie
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: polymetrie
+  template:
+    metadata:
+      labels:
+        app: polymetrie
+    spec:
+      containers:
+      - name: polymetrie
+        image: polymetrie:latest
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 80

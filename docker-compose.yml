@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  database-client:
+    image: postgres:14
+    environment:
+      - POSTGRES_PASSWORD=postgrespass
+      - POSTGRES_USER=postgrespass
+      - POSTGRES_DB=database-client
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+
+  polymetrie:
+    image: polymetrie
+    ports:
+      - "5000:5000"
+    depends_on:
+      - database-client
+      - redis
+    environment:
+      - FLASK_ENV=development  # Change to "production" in production
