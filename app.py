@@ -6,16 +6,16 @@ app = Flask(__name__)
 
 # Configuration de la base de données client (PostgreSQL)
 client_db_conn = connect(
-    dbname="database-client",
-    user="postgrespass",
-    password="postgrespass",
-    host="database-client",
+    dbname="postgres",
+    user="postgres",
+    password="cBxkAqQtZR",
+    host="postgresql",
     port=5432
 )
 client_db_cursor = client_db_conn.cursor()
 
 # Configuration de la base de données du compteur de page (Redis)
-page_counter_db = StrictRedis(host='redis-master', port=6379, db=0)
+page_counter_db = StrictRedis(host='redis-master.default.svc.clustr.local', port=6379, db=0)
 
 @app.route('/healthz')
 def healthz():
