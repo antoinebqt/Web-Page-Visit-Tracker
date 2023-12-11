@@ -16,7 +16,7 @@ client_db_conn = connect(
 client_db_cursor = client_db_conn.cursor()
 
 # Configuration de la base de données du compteur de page (Redis)
-page_counter_db = StrictRedis(host='redis-master', port=6379, db=0)
+page_counter_db = StrictRedis(host='redis-master', port=6379, db=0,password="ov6D2EYYcb")
 
 
 @app.route('/createTable')
