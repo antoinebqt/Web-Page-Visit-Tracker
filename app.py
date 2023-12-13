@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from psycopg2 import connect
 from redis import StrictRedis
+import os
 
 
 app = Flask(__name__)
@@ -16,7 +17,8 @@ client_db_conn = connect(
 client_db_cursor = client_db_conn.cursor()
 
 # Configuration de la base de données du compteur de page (Redis)
-page_counter_db = StrictRedis(host='redis-master', port=6379, db=0,password="ov6D2EYYcb")
+redis_password = os.environ.get("REDIS_PASSWORD")  # Utilisez le nom de variable que vous avez défini dans le playbook
+page_counter_db = StrictRedis(host='redis-master', port=6379, db=0, password=redis_password)
 
 
 @app.route('/createTable')

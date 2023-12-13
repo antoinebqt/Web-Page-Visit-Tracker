@@ -2,6 +2,8 @@
   hosts: localhost
   gather_facts: false
   become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
   tasks:
     - name: Install Helm Chart for Redis
@@ -10,9 +12,23 @@
         chart_ref: bitnami/redis
         release_namespace: default
         create_namespace: true
-        values:
-          redisPassword: "ov6D2EYYcb"
 
+    - name: Wait for Redis deployment to finish (adjust sleep time as needed)
+      pause:
+        seconds: 10
+
+    - name: Set Redis Password as Environment Variable
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: redis-config
+            namespace: default
+          data:
+            REDIS_PASSWORD: "{{ lookup('pipe', 'kubectl get secret --namespace default redis -o jsonpath={.data.redis-password} | base64 --decode') }}"
+            
     - name: Install Helm Chart for PostgreSQL
       kubernetes.core.helm:
         name: postgresql
