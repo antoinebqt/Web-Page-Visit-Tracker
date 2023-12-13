@@ -1,24 +1,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: polymetrie
+  name: polymetrie-app
   labels:
-    app: polymetrie
+    app: polymetrie-app
   namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: polymetrie
+      app: polymetrie-app
   template:
     metadata:
       labels:
-        app: polymetrie
+        app: polymetrie-app
     spec:
       containers:
-      - name: polymetrie
+      - name: polymetrie-app
         image: leolebossducloud/polymetrie:latest
         env:
+        - name: REDIS_HOST
+          value: "redis-master"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: REDIS_DB
+          value: "0"
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:

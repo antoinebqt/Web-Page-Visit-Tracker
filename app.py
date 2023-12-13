@@ -1,17 +1,14 @@
 from flask import Flask, request, jsonify
 from psycopg2 import connect
 from redis import StrictRedis
-import os
-
-# import psutil
-
 # from prometheus_client import Counter, Gauge, Histogram, generate_latest, CONTENT_TYPE_LATEST
 # from prometheus_client.registry import CollectorRegistry
-
+import os
+# import psutil
 
 app = Flask(__name__)
-# registry = CollectorRegistry(auto_describe=True)
 
+# registry = CollectorRegistry(auto_describe=True)
 # http_requests_total = Counter('http_requests_total', 'Total number of HTTP requests', registry=registry)
 # request_duration = Histogram('request_duration_seconds', 'Duration of HTTP requests in seconds', registry=registry)
 # memory_usage = Gauge('memory_usage_bytes', 'Memory usage in bytes', registry=registry)
@@ -36,8 +33,7 @@ app = Flask(__name__)
 #     return generate_latest(registry), 200, {'Content-Type': CONTENT_TYPE_LATEST}
 
 
-
-# Configuration de la base de données client (PostgreSQL)
+# Connexion à la base de données des clients (PostgreSQL)
 client_db_conn = connect(
     dbname="postgres",
     user="postgres",
@@ -47,38 +43,46 @@ client_db_conn = connect(
 )
 client_db_cursor = client_db_conn.cursor()
 
-# Configuration de la base de données du compteur de page (Redis)
-redis_password = os.environ.get("REDIS_PASSWORD")  # Utilisez le nom de variable que vous avez défini dans le playbook
-page_counter_db = StrictRedis(host='redis-master', port=6379, db=0, password=redis_password)
+# Connexion à la base de données du tracker (Redis)
+page_counter_db = StrictRedis(
+    host=os.environ.get("REDIS_HOST"),
+    port=os.environ.get("REDIS_PORT"),
+    db=os.environ.get("REDIS_DB"),
+    password=os.environ.get("REDIS_PASSWORD"))
 
+app.config['table_created'] = False
 
-@app.route('/createTable')
 def createTable():
-    try:
-        # Define the SQL query to create a table
-        create_table_query = '''
-            CREATE TABLE IF NOT EXISTS clients (
-                                       id SERIAL PRIMARY KEY,
-                                       url VARCHAR(255) NOT NULL
-            );
-        '''
+    if app.config['table_created']:
+        return
+    else:
+        try:
+            # Define the SQL query to create a table
+            create_table_query = '''
+                CREATE TABLE IF NOT EXISTS clients (
+                                        id SERIAL PRIMARY KEY,
+                                        url VARCHAR(255) NOT NULL
+                );
+            '''
 
-        # Execute the query to create the table
-        client_db_cursor.execute(create_table_query)
+            # Execute the query to create the table
+            client_db_cursor.execute(create_table_query)
 
-        # Commit the changes to the database
-        client_db_conn.commit()
+            # Commit the changes to the database
+            client_db_conn.commit()
 
-        return jsonify({"message": "Table created successfully!"}), 200
+            app.config['table_created'] = True
 
-    except Exception as e:
-        # Handle any exceptions that might occur during the table creation
-        return jsonify({"error": str(e)}), 500
-
+        except Exception as e:
+            # Handle any exceptions that might occur during the table creation
+            return jsonify({"error": str(e)}), 500
 
 @app.route('/track', methods=['POST'])
 def track_page_visit():
     try:
+        if not app.config['table_created']:
+            createTable()
+
         payload = request.get_json()
 
         # Récupération du domaine de l'URL
@@ -97,6 +101,9 @@ def track_page_visit():
 @app.route('/add_client', methods=['POST'])
 def add_client():
     try:
+        if not app.config['table_created']:
+            createTable()
+
         data = request.get_json()
         client_url = data.get('client_url')
 
@@ -110,6 +117,9 @@ def add_client():
 @app.route('/get_clients', methods=['GET'])
 def get_clients():
     try:
+        if not app.config['table_created']:
+            createTable()
+
         # Récupération de la liste de tous les clients depuis la base de données client
         client_db_cursor.execute("SELECT url FROM clients")
         clients = client_db_cursor.fetchall()
@@ -133,6 +143,9 @@ def get_redis_data():
 @app.route('/delete_client', methods=['POST'])
 def delete_client():
     try:
+        if not app.config['table_created']:
+            createTable()
+
         data = request.get_json()
         client_url = data.get('client_url')
 

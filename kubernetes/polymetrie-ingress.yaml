@@ -5,7 +5,7 @@ metadata:
   namespace: default
 spec:
   rules:
-  - host: polymetrie.com
+  - host: polymetrie.teama.fr
     http:
       paths:
       - path: /
