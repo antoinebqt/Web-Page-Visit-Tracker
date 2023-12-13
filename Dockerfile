@@ -2,6 +2,7 @@
 FROM python:3.9
 
 # Installation des dépendances
+#RUN pip install Flask redis psycopg2-binary psutil prometheus_client
 RUN pip install Flask redis psycopg2-binary
 
 # Configuration de l'environnement

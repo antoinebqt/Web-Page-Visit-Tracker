@@ -1,3 +1,4 @@
+---
 - name: Deploy Polymetrie Application
   hosts: localhost
   gather_facts: false
@@ -6,29 +7,6 @@
     ansible_python_interpreter: /usr/bin/python3
 
   tasks:
-    - name: Install Helm Chart for Redis
-      kubernetes.core.helm:
-        name: redis
-        chart_ref: bitnami/redis
-        release_namespace: default
-        create_namespace: true
-
-    - name: Wait for Redis deployment to finish (adjust sleep time as needed)
-      pause:
-        seconds: 10
-
-    - name: Set Redis Password as Environment Variable
-      kubernetes.core.k8s:
-        state: present
-        definition:
-          apiVersion: v1
-          kind: ConfigMap
-          metadata:
-            name: redis-config
-            namespace: default
-          data:
-            REDIS_PASSWORD: "{{ lookup('pipe', 'kubectl get secret --namespace default redis -o jsonpath={.data.redis-password} | base64 --decode') }}"
-            
     - name: Install Helm Chart for PostgreSQL
       kubernetes.core.helm:
         name: postgresql
@@ -37,6 +15,32 @@
         create_namespace: true
         values:
           postgresqlPassword: "cBxkAqQtZR"
+
+    - name: Install Helm Chart for Redis
+      kubernetes.core.helm:
+        name: redis
+        chart_ref: bitnami/redis
+        release_namespace: default
+        #create_namespace: true
+
+    - name: Wait for Redis and Postgres deployment to finish
+      pause:
+        seconds: 25
+
+    # - name: Extract Redis password from Kubernetes secret
+    #   shell: kubectl get secret --namespace default redis -o jsonpath="{.data.redis-password}" | base64 -d
+    #   register: redis_password_result
+    #   changed_when: false
+
+    # - name: Debug - Display Redis password result
+    #   debug:
+    #     var: redis_password_result
+
+    # - name: Set REDIS_PASSWORD environment variable
+    #   ansible.builtin.set_fact:
+    #     redis_password: "{{ redis_password_result.stdout }}"
+
+
 
     - name: Apply Kubernetes YAML files
       kubernetes.core.k8s:
