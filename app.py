@@ -133,7 +133,7 @@ def get_clients():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
 
-@app.route('/metrics', methods=['GET'])
+@app.route('/metrics_old', methods=['GET'])
 def get_redis_data():
     try:
         # Récupération de toutes les clés et valeurs dans la base de données Redis
