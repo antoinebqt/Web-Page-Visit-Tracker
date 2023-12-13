@@ -2,8 +2,56 @@ from flask import Flask, request, jsonify
 from psycopg2 import connect
 from redis import StrictRedis
 
+import psutil
+
+from prometheus_client import Counter, Gauge, Histogram, generate_latest, CONTENT_TYPE_LATEST
+from prometheus_client.registry import CollectorRegistry
+
 
 app = Flask(__name__)
+registry = CollectorRegistry(auto_describe=True)
+
+http_requests_total = Counter('http_requests_total', 'Total number of HTTP requests', registry=registry)
+request_duration = Histogram('request_duration_seconds', 'Duration of HTTP requests in seconds', registry=registry)
+memory_usage = Gauge('memory_usage_bytes', 'Memory usage in bytes', registry=registry)
+cpu_time = Gauge('cpu_time_seconds', 'CPU time consumed in seconds', registry=registry)
+@app.before_request
+def before_request():
+    http_requests_total.inc()
+
+@app.after_request
+def after_request(response):
+    request_duration.observe(response.elapsed.total_seconds())
+    # Record memory usage
+    memory_usage.set(psutil.Process().memory_info().rss)
+
+    # Record CPU time
+    cpu_time.set(psutil.Process().cpu_percent() / 100.0)
+    return response
+
+# Endpoint /metrics pour Prometheus
+@app.route('/metrics')
+def metrics():
+    return generate_latest(registry), 200, {'Content-Type': CONTENT_TYPE_LATEST}
+
+def simulate_work():
+    import time
+    import random
+    import os
+
+    memory_usage.set(os.statvfs('/').f_bsize * os.statvfs('/').f_blocks)
+    cpu_time.set(time.process_time())
+
+    # Simuler une charge de travail aléatoire
+    time.sleep(random.uniform(0.1, 0.5))
+
+# Endpoint pour simuler le webservice de tracking Polymétrie
+@app.route('/track')
+def track():
+    simulate_work()
+    return 'Tracking request processed successfully!'
+
+
 
 # Configuration de la base de données client (PostgreSQL)
 client_db_conn = connect(
