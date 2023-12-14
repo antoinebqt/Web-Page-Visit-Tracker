@@ -2,9 +2,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: polymetrie-service
+  namespace: default
 spec:
   selector:
-    app: polymetrie
+    app: polymetrie-app
   ports:
     - protocol: TCP
       port: 80

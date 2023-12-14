@@ -1,0 +1,57 @@
+---
+- name: Deploy Polymetrie Application
+  hosts: localhost
+
+  tasks:
+    - name: Add the Bitnami Chart Repository
+      kubernetes.core.helm_repository:
+        name: bitnami
+        repo_url: "https://charts.bitnami.com/bitnami"
+
+    - name: Apply PostgreSQL Database
+      kubernetes.core.helm:
+        name: postgresql
+        chart_ref: bitnami/postgresql
+        release_namespace: default
+        values:
+          postgresqlPassword: "cBxkAqQtZR"
+
+    - name: Apply Redis Database
+      kubernetes.core.helm:
+        name: redis
+        chart_ref: bitnami/redis
+        release_namespace: default
+
+    - name: Apply Kubernetes Dashboard
+      kubernetes.core.k8s:
+        state: present
+        src: ../kubernetes/dashboard.yaml
+
+    - name: Apply Service Account for Kubernetes Dashboard
+      kubernetes.core.k8s:
+        state: present
+        src: ../kubernetes/dashboard-admin.yaml
+
+    - name: Apply Polymetrie Deployment
+      kubernetes.core.k8s:
+        state: present
+        src: ../kubernetes/polymetrie-deployment.yaml
+
+    - name: Apply Polymetrie Service
+      kubernetes.core.k8s:
+        state: present
+        src: ../kubernetes/polymetrie-service.yaml
+
+    - name: Apply Polymetrie Ingress
+      kubernetes.core.k8s:
+        state: present
+        src: ../kubernetes/polymetrie-ingress.yaml
+
+    - name: Extract the Kubernetes Dashboard Token
+      ansible.builtin.shell:
+        cmd: kubectl get secret admin-user -n kubernetes-dashboard -o jsonpath={".data.token"} | base64 -d
+      register: kubectl_output
+
+    - name: Print the Kubernetes Dashboard Token
+      ansible.builtin.debug:
+        var: kubectl_output.stdout_lines

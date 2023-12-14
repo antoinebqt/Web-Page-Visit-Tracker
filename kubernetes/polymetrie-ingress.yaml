@@ -2,9 +2,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: polymetrie-ingress
+  namespace: default
 spec:
   rules:
-  - host: polymetrie.com
+  - host: polymetrie.teama.fr
     http:
       paths:
       - path: /
