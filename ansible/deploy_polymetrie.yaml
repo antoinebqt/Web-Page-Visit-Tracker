@@ -13,24 +13,14 @@
         name: postgresql
         chart_ref: bitnami/postgresql
         release_namespace: default
-        values:
-          postgresqlPassword: "cBxkAqQtZR"
+        values_files:
+          - ../kubernetes/postgresql-values.yaml
 
     - name: Apply Redis Database
       kubernetes.core.helm:
         name: redis
         chart_ref: bitnami/redis
         release_namespace: default
-
-    - name: Apply Kubernetes Dashboard
-      kubernetes.core.k8s:
-        state: present
-        src: ../kubernetes/dashboard.yaml
-
-    - name: Apply Service Account for Kubernetes Dashboard
-      kubernetes.core.k8s:
-        state: present
-        src: ../kubernetes/dashboard-admin.yaml
 
     - name: Apply Polymetrie Deployment
       kubernetes.core.k8s:
@@ -46,6 +36,26 @@
       kubernetes.core.k8s:
         state: present
         src: ../kubernetes/polymetrie-ingress.yaml
+
+- name: Deploy Kubernetes Dashboard
+  hosts: localhost
+
+  tasks:
+    - name: Apply Kubernetes Dashboard
+      kubernetes.core.k8s:
+        state: present
+        src: ../kubernetes/dashboard.yaml
+
+    - name: Apply Service Account for Kubernetes Dashboard
+      kubernetes.core.k8s:
+        state: present
+        src: ../kubernetes/dashboard-admin.yaml
+
+    - name: Start proxy
+      ansible.builtin.shell:
+        cmd: "kubectl proxy &"
+      async: 0
+      poll: 0
 
     - name: Extract the Kubernetes Dashboard Token
       ansible.builtin.shell:

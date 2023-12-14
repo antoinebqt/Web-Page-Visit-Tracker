@@ -1,0 +1,4 @@
+primary:
+  name: primary
+  pgHbaConfiguration: |-
+    host all all all trust
