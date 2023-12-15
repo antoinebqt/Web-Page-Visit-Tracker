@@ -1,43 +1,18 @@
 from flask import Flask, request, jsonify
 from psycopg2 import connect
 from redis import StrictRedis
-# from prometheus_client import Counter, Gauge, Histogram, generate_latest, CONTENT_TYPE_LATEST
-# from prometheus_client.registry import CollectorRegistry
+from prometheus_flask_exporter import PrometheusMetrics
+
 import os
-# import psutil
 
 app = Flask(__name__)
-
-# registry = CollectorRegistry(auto_describe=True)
-# http_requests_total = Counter('http_requests_total', 'Total number of HTTP requests', registry=registry)
-# request_duration = Histogram('request_duration_seconds', 'Duration of HTTP requests in seconds', registry=registry)
-# memory_usage = Gauge('memory_usage_bytes', 'Memory usage in bytes', registry=registry)
-# cpu_time = Gauge('cpu_time_seconds', 'CPU time consumed in seconds', registry=registry)
-# @app.before_request
-# def before_request():
-#     http_requests_total.inc()
-
-# @app.after_request
-# def after_request(response):
-#     request_duration.observe(response.elapsed.total_seconds())
-#     # Record memory usage
-#     memory_usage.set(psutil.Process().memory_info().rss)
-
-#     # Record CPU time
-#     cpu_time.set(psutil.Process().cpu_percent() / 100.0)
-#     return response
-
-# # Endpoint /metrics pour Prometheus
-# @app.route('/metrics')
-# def metrics():
-#     return generate_latest(registry), 200, {'Content-Type': CONTENT_TYPE_LATEST}
-
+PrometheusMetrics(app)
 
 # Connexion à la base de données des clients (PostgreSQL)
 client_db_conn = connect(
     dbname="postgres",
     user="postgres",
-    password="cBxkAqQtZR",
+    password="postgrespass",
     host="postgresql",
     port=5432
 )
@@ -107,6 +82,10 @@ def add_client():
         data = request.get_json()
         client_url = data.get('client_url')
 
+        # Vérification si le client existe déjà
+        if is_client_exists(client_url):
+            return jsonify({"status": "error", "message": "Client already exists"})
+
         # Ajout du client à la base de données client
         add_client_to_database(client_url)
 
@@ -137,7 +116,7 @@ def get_redis_data():
 
         return jsonify({"status": "success", "metrics_data": redis_data})
     except Exception as e:
-        return jsonify({"status": "error", "message": str(e) + " redis_password:" + redis_password})
+        return jsonify({"status": "error", "message": str(e)})
 
 
 @app.route('/delete_client', methods=['POST'])
@@ -149,12 +128,17 @@ def delete_client():
         data = request.get_json()
         client_url = data.get('client_url')
 
+        # Vérification si le client existe avant de le supprimer
+        if not is_client_exists(client_url):
+            return jsonify({"status": "error", "message": "Client does not exist"})
+
         # Suppression du client de la base de données client
         delete_client_from_database(client_url)
 
         return jsonify({"status": "success", "message": "Client deleted successfully"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
+
 
 def delete_client_from_database(client_url):
     # Suppression du client de la base de données client
@@ -174,6 +158,11 @@ def add_client_to_database(client_url):
 def get_domain_from_url(url):
     # "https://polytech.univ-cotedazur.fr/ecole/association-alumni" -> "polytech.univ-cotedazur.fr"
     return url.split('/')[2]
+
+def is_client_exists(client_url):
+    # Vérification dans la base de données client si le client existe déjà
+    client_db_cursor.execute("SELECT COUNT(*) FROM clients WHERE url = %s", (client_url,))
+    return client_db_cursor.fetchone()[0] > 0
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
