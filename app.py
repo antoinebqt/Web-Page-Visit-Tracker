@@ -8,6 +8,8 @@ import os
 app = Flask(__name__)
 PrometheusMetrics(app)
 
+BASE_URI = "/polymetrie"
+
 # Connexion à la base de données des clients (PostgreSQL)
 client_db_conn = connect(
     dbname="postgres",
@@ -52,7 +54,7 @@ def createTable():
             # Handle any exceptions that might occur during the table creation
             return jsonify({"error": str(e)}), 500
 
-@app.route('/track', methods=['POST'])
+@app.route(BASE_URI + '/track', methods=['POST'])
 def track_page_visit():
     try:
         if not app.config['table_created']:
@@ -73,7 +75,7 @@ def track_page_visit():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
 
-@app.route('/add_client', methods=['POST'])
+@app.route(BASE_URI + '/add_client', methods=['POST'])
 def add_client():
     try:
         if not app.config['table_created']:
@@ -93,7 +95,7 @@ def add_client():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
 
-@app.route('/get_clients', methods=['GET'])
+@app.route(BASE_URI + '/get_clients', methods=['GET'])
 def get_clients():
     try:
         if not app.config['table_created']:
@@ -107,7 +109,7 @@ def get_clients():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
 
-@app.route('/metrics_old', methods=['GET'])
+@app.route(BASE_URI + '/metrics_old', methods=['GET'])
 def get_redis_data():
     try:
         # Récupération de toutes les clés et valeurs dans la base de données Redis
@@ -119,7 +121,7 @@ def get_redis_data():
         return jsonify({"status": "error", "message": str(e)})
 
 
-@app.route('/delete_client', methods=['POST'])
+@app.route(BASE_URI + '/delete_client', methods=['POST'])
 def delete_client():
     try:
         if not app.config['table_created']:

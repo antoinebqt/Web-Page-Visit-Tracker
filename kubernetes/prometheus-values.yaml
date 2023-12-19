@@ -1,0 +1,27 @@
+grafana:
+  adminpassword: "admin"
+  persistence:
+    enabled: true
+    size: 1Gi
+  service:
+    type: LoadBalancer
+  env:  # Ajout des variables d'environnement
+    GF_SERVER_ROOT_URL: http://polymetrie-service.orch-team-a.pns-projects.fr.eu.org/grafana/
+    GF_SERVER_SERVE_FROM_SUB_PATH: true
+
+prometheus:
+  prometheusSpec:
+    retention: 7d
+    serviceMonitorSelectorNilUsesHelmValues: false
+    externalUrl: http://polymetrie-service.orch-team-a.pns-projects.fr.eu.org/prometheus/
+    routePrefix: /prometheus
+  service:
+    type: LoadBalancer
+  storageSpec:
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 16Gi

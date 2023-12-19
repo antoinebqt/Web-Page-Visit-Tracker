@@ -4,14 +4,15 @@ metadata:
   name: polymetrie-ingress
   namespace: default
 spec:
+  ingressClassName: nginx
   rules:
-  - host: polymetrie.teama.fr
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: polymetrie-service
-            port:
-              number: 80
+    - host: polymetrie-service.orch-team-a.pns-projects.fr.eu.org
+      http:
+        paths:
+          - path: /polymetrie
+            pathType: Prefix
+            backend:
+              service:
+                name: polymetrie-service
+                port:
+                  number: 80
