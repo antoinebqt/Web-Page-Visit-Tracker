@@ -21,15 +21,9 @@ resource "helm_release" "postgresql" {
   namespace       = var.terraform_namespace
   create_namespace = true
 
-  set {
-    name  = "name"
-    value = "primary"
-  }
-
-  set {
-    name  = "pgHbaConfiguration"
-    value = "host all all all trust"
-  }
+  values = [
+      file("../kubernetes/postgresql-values.yaml"),
+    ]
 
 }
 
