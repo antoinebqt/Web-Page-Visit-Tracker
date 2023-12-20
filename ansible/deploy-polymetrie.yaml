@@ -15,12 +15,18 @@
         release_namespace: default
         values_files:
           - ../kubernetes/postgresql-values.yaml
+        state: present
 
     - name: Apply Redis Database
       kubernetes.core.helm:
         name: redis
         chart_ref: bitnami/redis
         release_namespace: default
+        state: present
+
+    - name: Wait for PostgreSQL to be ready
+      pause:
+        seconds: 20
 
     - name: Apply Polymetrie Deployment
       kubernetes.core.k8s:
@@ -36,32 +42,3 @@
       kubernetes.core.k8s:
         state: present
         src: ../kubernetes/polymetrie-ingress.yaml
-
-- name: Deploy Kubernetes Dashboard
-  hosts: localhost
-
-  tasks:
-    - name: Apply Kubernetes Dashboard
-      kubernetes.core.k8s:
-        state: present
-        src: ../kubernetes/dashboard.yaml
-
-    - name: Apply Service Account for Kubernetes Dashboard
-      kubernetes.core.k8s:
-        state: present
-        src: ../kubernetes/dashboard-admin.yaml
-
-    - name: Start proxy
-      ansible.builtin.shell:
-        cmd: "kubectl proxy &"
-      async: 0
-      poll: 0
-
-    - name: Extract the Kubernetes Dashboard Token
-      ansible.builtin.shell:
-        cmd: kubectl get secret admin-user -n kubernetes-dashboard -o jsonpath={".data.token"} | base64 -d
-      register: kubectl_output
-
-    - name: Print the Kubernetes Dashboard Token
-      ansible.builtin.debug:
-        var: kubectl_output.stdout_lines

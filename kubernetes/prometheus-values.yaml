@@ -13,6 +13,7 @@ prometheus:
   prometheusSpec:
     retention: 7d
     serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
     externalUrl: http://polymetrie-service.orch-team-a.pns-projects.fr.eu.org/prometheus/
     routePrefix: /prometheus
   service:
