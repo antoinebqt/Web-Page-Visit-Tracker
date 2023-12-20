@@ -9,7 +9,7 @@ spec:
     - host: polymetrie-service.orch-team-a.pns-projects.fr.eu.org
       http:
         paths:
-          - path: /polymetrie
+          - path: /
             pathType: Prefix
             backend:
               service:

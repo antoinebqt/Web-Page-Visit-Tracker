@@ -6,17 +6,20 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: polymetrie-service.orch-team-a.pns-projects.fr.eu.org
+    - host: grafana.orch-team-a.pns-projects.fr.eu.org
       http:
           paths:
-            - path: /grafana
+            - path: /
               pathType: Prefix
               backend:
                 service:
                   name: prometheus-grafana
                   port:
                     number: 80
-            - path: /prometheus
+    - host: prometheus.orch-team-a.pns-projects.fr.eu.org
+      http:
+          paths:
+            - path: /
               pathType: Prefix
               backend:
                 service:
