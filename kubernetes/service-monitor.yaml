@@ -3,6 +3,8 @@ kind: ServiceMonitor
 metadata:
   name: polymetrie-service
   namespace: default
+  labels:
+    app: polymetrie-app
 spec:
   selector:
     matchLabels:
