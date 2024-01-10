@@ -2,10 +2,16 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: polymetrie-app-monitor
-  namespace: default
+  namespace: prometheus
+  labels:
+    name: polymetrie-app-monitor
 spec:
   selector:
     matchLabels:
       app: polymetrie-app
+  namespaceSelector:
+    matchNames:
+    - "default"
   endpoints:
-  - port: "5000"
+    - port: polymetrie-port
+      interval: 15s
