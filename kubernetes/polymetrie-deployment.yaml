@@ -32,8 +32,13 @@ spec:
               key: redis-password
         ports:
         - containerPort: 80
+        resources:
+          limits:
+            cpu: 500m
+          requests:
+            cpu: 200m
 ---
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: polymetrie-hpa
@@ -43,8 +48,9 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: polymetrie-app
+    namespace: default
   minReplicas: 1
-  maxReplicas: 5
+  maxReplicas: 10
   metrics:
   - type: Resource
     resource:
