@@ -1,0 +1,26 @@
+grafana:
+  adminpassword: "admin"
+  persistence:
+    enabled: true
+    size: 1Gi
+  service:
+    type: LoadBalancer
+
+prometheus:
+  enabled: true
+  prometheusSpec:
+    retention: 7d
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+    probeSelectorNilUsesHelmValues: false
+  service:
+    type: LoadBalancer
+  storageSpec:
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 16Gi

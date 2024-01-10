@@ -3,10 +3,13 @@ kind: Service
 metadata:
   name: polymetrie-service
   namespace: default
+  labels:
+    app: polymetrie-app
 spec:
   selector:
     app: polymetrie-app
   ports:
-    - protocol: TCP
+    - name: polymetrie-port
+      protocol: TCP
       port: 80
       targetPort: 5000

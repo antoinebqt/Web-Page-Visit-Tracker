@@ -1,0 +1,12 @@
+chmod +x scripts/build.sh
+chmod +x scripts/cleanAll.sh
+chmod +x scripts/cleanDashboard.sh
+chmod +x scripts/cleanNginx.sh
+chmod +x scripts/cleanPolymetrie.sh
+chmod +x scripts/cleanPrometheus.sh
+chmod +x scripts/deployAll.sh
+chmod +x scripts/deployDashboard.sh
+chmod +x scripts/deployNginx.sh
+chmod +x scripts/deployPolymetrie.sh
+chmod +x scripts/deployPrometheus.sh
+chmod +x scripts/pushDockerhub.sh

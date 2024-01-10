@@ -1,0 +1,3 @@
+scripts/deployPolymetrie.sh
+scripts/deployPrometheus.sh
+scripts/deployDashboard.sh
