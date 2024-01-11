@@ -22,3 +22,20 @@
         state: present
         src: ../kubernetes/prometheus-ingress.yaml
         namespace: prometheus
+
+    - name: Apply Polymetrie Service Monitor
+      kubernetes.core.k8s:
+        state: present
+        src: ../kubernetes/polymetrie-service-monitor.yaml
+        namespace: prometheus
+
+    - name: Apply Prometheus Service Account
+      kubernetes.core.k8s:
+        state: present
+        src: ../kubernetes/prometheus-service-account.yaml
+        namespace: prometheus
+    - name: Apply Prometheus Config
+      kubernetes.core.k8s:
+        state: present
+        src: ../kubernetes/prometheus-config.yaml
+        namespace: prometheus
