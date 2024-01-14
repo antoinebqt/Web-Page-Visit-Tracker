@@ -8,7 +8,7 @@ import os
 app = Flask(__name__)
 PrometheusMetrics(app)
 
-BASE_URI = "/polymetrie"
+BASE_URI = ""
 
 # Connexion à la base de données des clients (PostgreSQL)
 client_db_conn = connect(
@@ -109,7 +109,7 @@ def get_clients():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
 
-@app.route(BASE_URI + '/metrics_old', methods=['GET'])
+@app.route(BASE_URI + '/data', methods=['GET'])
 def get_redis_data():
     try:
         # Récupération de toutes les clés et valeurs dans la base de données Redis
@@ -141,6 +141,21 @@ def delete_client():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
 
+
+def list_routes():
+    result = []
+    for rule in app.url_map.iter_rules():
+        result.append({
+            'endpoint': rule.endpoint,
+            'methods': ', '.join(rule.methods),
+            'path': str(rule),
+        })
+    return result
+
+@app.route(BASE_URI + '/', methods=['GET'])
+def show_routes():
+    routes = list_routes()
+    return jsonify({'routes': routes})
 
 def delete_client_from_database(client_url):
     # Suppression du client de la base de données client
