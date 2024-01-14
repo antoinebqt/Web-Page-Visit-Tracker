@@ -22,4 +22,3 @@ spec:
       selfHeal: true
       prune: true
 
-  sourceSecretName: argocd-repo-secret
