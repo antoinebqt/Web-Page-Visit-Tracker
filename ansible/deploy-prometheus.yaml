@@ -34,6 +34,7 @@
         state: present
         src: ../kubernetes/prometheus-service-account.yaml
         namespace: prometheus
+  
     - name: Apply Prometheus Config
       kubernetes.core.k8s:
         state: present
