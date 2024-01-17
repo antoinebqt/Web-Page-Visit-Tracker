@@ -21,7 +21,8 @@ jobs:
         uses: docker/setup-buildx-action@v1
 
       - name: Login to Container Registry
-        run: echo "${DOCKERHUB_TOKEN}" | docker login docker.io -u "${DOCKERHUB_USERNAME}" --password-stdin
+        run: |
+          echo $DOCKERHUB_TOKEN | docker login -u $DOCKERHUB_USERNAME --password-stdin docker.io
 
       - name: Build and Push Docker Image
         run: |
