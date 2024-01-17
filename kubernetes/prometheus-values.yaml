@@ -12,6 +12,8 @@ prometheus:
     retention: 7d
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+    probeSelectorNilUsesHelmValues: false
   service:
     type: LoadBalancer
   storageSpec:
