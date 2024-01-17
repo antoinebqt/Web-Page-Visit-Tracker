@@ -2,8 +2,11 @@ from flask import Flask, request, jsonify
 from psycopg2 import connect
 from redis import StrictRedis
 from prometheus_flask_exporter import PrometheusMetrics
-
+from prometheus_client import Gauge
 import os
+
+website_metric = Gauge('website_visits', 'Number of visits to a website', ['client', 'route'])
+
 
 app = Flask(__name__)
 PrometheusMetrics(app)
@@ -69,6 +72,7 @@ def track_page_visit():
         if is_client_authorized(domain):
             # Incrémentation du compteur de page dans Redis
             page_counter_db.incr(payload['tracker']['WINDOW_LOCATION_HREF'])
+            website_metric.labels(client=get_domain_from_url(payload['tracker']['WINDOW_LOCATION_HREF']), route=payload['tracker']['WINDOW_LOCATION_HREF']).set(page_counter_db.get(payload['tracker']['WINDOW_LOCATION_HREF']))
             return jsonify({"status": "success", "message": "Page visit tracked successfully"})
         else:
             return jsonify({"status": "error", "message": "Unauthorized client"})
