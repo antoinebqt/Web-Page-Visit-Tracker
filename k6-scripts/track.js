@@ -14,9 +14,9 @@ export let options = {
 
 // URLs list
 const urls = [
-    "https://test-k6-1.fr/tracking-test-v2",
-    "https://test-k6-2.fr/tracking-test-v2",
-    "https://test-k6-3.fr/tracking-test-v2"
+    "https://test-k6-1.fr/tracking-test-v3",
+    "https://test-k6-2.fr/tracking-test-v3",
+    "https://test-k6-3.fr/tracking-test-v3"
 ];
 
 export default function () {
