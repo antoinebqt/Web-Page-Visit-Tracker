@@ -15,6 +15,7 @@ spec:
     namespace: default
 
   syncPolicy:
+    automated: {}
     syncOptions:
     - CreateNamespace=true
 
