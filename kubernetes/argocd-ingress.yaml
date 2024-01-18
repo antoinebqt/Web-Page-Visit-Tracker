@@ -1,11 +1,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  annotations:
-    kubernetes.io/ingress.class: nginx
-  name: ingress
+  name: argocd-ingress
   namespace: argocd
 spec:
+  ingressClassName: nginx
   rules:
   - host: argocd.orch-team-a.pns-projects.fr.eu.org
     http:
