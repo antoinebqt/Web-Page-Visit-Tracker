@@ -12,7 +12,7 @@ spec:
     path: kubernetes
   destination:
     server: https://kubernetes.default.svc
-    namespace: test
+    namespace: default
 
   syncPolicy:
     syncOptions:
