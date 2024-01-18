@@ -1,9 +1,16 @@
+from threading import Thread
+
 from flask import Flask, request, jsonify
 from psycopg2 import connect
 from redis import StrictRedis
 from prometheus_flask_exporter import PrometheusMetrics
-
+from prometheus_client import Gauge
 import os
+import time
+
+
+website_metric = Gauge('website_visits', 'Number of visits to the website', ['subscriber', 'url_page'])
+
 
 app = Flask(__name__)
 PrometheusMetrics(app)
@@ -62,17 +69,19 @@ def track_page_visit():
 
         payload = request.get_json()
 
+
         # Récupération du domaine de l'URL
         domain = get_domain_from_url(payload['tracker']['WINDOW_LOCATION_HREF'])
-
         # Vérification si le site web est autorisé
         if is_client_authorized(domain):
             # Incrémentation du compteur de page dans Redis
             page_counter_db.incr(payload['tracker']['WINDOW_LOCATION_HREF'])
+            website_metric.labels(subscriber=get_domain_from_url(payload['tracker']['WINDOW_LOCATION_HREF']), url_page=payload['tracker']['WINDOW_LOCATION_HREF']).set(page_counter_db.get(payload['tracker']['WINDOW_LOCATION_HREF']).decode())
             return jsonify({"status": "success", "message": "Page visit tracked successfully"})
         else:
             return jsonify({"status": "error", "message": "Unauthorized client"})
     except Exception as e:
+        print(e)
         return jsonify({"status": "error", "message": str(e)})
 
 @app.route(BASE_URI + '/add_client', methods=['POST'])
@@ -181,5 +190,27 @@ def is_client_exists(client_url):
     client_db_cursor.execute("SELECT COUNT(*) FROM clients WHERE url = %s", (client_url,))
     return client_db_cursor.fetchone()[0] > 0
 
+def initialise_metrics(timeToSleep=120):
+    time.sleep(timeToSleep)
+    keys = page_counter_db.keys('*')
+    for key in keys:
+        print("url_page " + key.decode())
+        print("subscriber " + get_domain_from_url(key.decode()))
+        print("counter" + page_counter_db.get(key).decode())
+
+        website_metric.labels(subscriber=get_domain_from_url(key.decode()),
+                              url_page=key.decode()).set(
+            page_counter_db.get(key).decode())
+
+
 if __name__ == '__main__':
+
+
+    flask_thread = Thread(target=initialise_metrics)
+    flask_thread.start()
+
     app.run(host='0.0.0.0', port=5000)
+
+
+
+
