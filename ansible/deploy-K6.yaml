@@ -1,0 +1,14 @@
+---
+- name: Deploy K6
+  hosts: localhost
+
+  tasks:
+    - name: Apply K6 Deployment
+      kubernetes.core.k8s:
+        state: present
+        src: ../kubernetes/k6-deployment.yaml
+
+    - name: Apply K6 Service
+      kubernetes.core.k8s:
+        state: present
+        src: ../kubernetes/k6-service.yaml
