@@ -22,7 +22,10 @@
         name: redis
         chart_ref: bitnami/redis
         release_namespace: default
+        values_files:
+          - ../kubernetes/redis-values.yaml
         state: present
+
 
     - name: Wait for PostgreSQL to be ready
       pause:
