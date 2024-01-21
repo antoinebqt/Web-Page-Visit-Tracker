@@ -2,9 +2,12 @@ apiVersion: kibana.k8s.elastic.co/v1
 kind: Kibana
 metadata:
   name: kibana
+  namespace: elastic
 spec:
   version: 8.6.2
   count: 1
+  config:
+    monitoring.ui.ccs.enabled: false
   elasticsearchRef:
     name: elastic-cluster
   podTemplate:
@@ -16,7 +19,7 @@ spec:
           - name: NODE_OPTIONS
             value: "--max-old-space-size=2048"
           - name: SERVER_PUBLICBASEURL
-            value: "http://localhost:5601"
+            value: "http://kibana.orch-team-a.pns-projects.fr.eu.org"
         resources:
           requests:
             memory: 1Gi

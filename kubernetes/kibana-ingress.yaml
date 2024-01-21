@@ -3,14 +3,8 @@ kind: Ingress
 metadata:
   name: kibana
   namespace: elastic
-  annotations:
-    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
 spec:
   ingressClassName: nginx
-  tls:
-  - hosts:
-    - kibana.orch-team-a.pns-projects.fr.eu.org
-    secretName: <TLS-SECRET>
   rules:
   - host: kibana.orch-team-a.pns-projects.fr.eu.org
     http:
