@@ -8,6 +8,7 @@ from prometheus_client import Gauge
 import os
 import time
 
+metrics_initialised=False
 
 website_metric = Gauge('website_visits', 'Number of visits to the website', ['subscriber', 'url_page'])
 
@@ -64,6 +65,7 @@ def createTable():
 @app.route(BASE_URI + '/track', methods=['POST'])
 def track_page_visit():
     try:
+        initialise_metrics(1)
         if not app.config['table_created']:
             createTable()
 
@@ -191,6 +193,7 @@ def is_client_exists(client_url):
     return client_db_cursor.fetchone()[0] > 0
 
 def initialise_metrics(timeToSleep=120):
+    global metrics_initialised
     time.sleep(timeToSleep)
     keys = page_counter_db.keys('*')
     for key in keys:
@@ -201,6 +204,7 @@ def initialise_metrics(timeToSleep=120):
         website_metric.labels(subscriber=get_domain_from_url(key.decode()),
                               url_page=key.decode()).set(
             page_counter_db.get(key).decode())
+    metrics_initialised=True
 
 
 if __name__ == '__main__':
