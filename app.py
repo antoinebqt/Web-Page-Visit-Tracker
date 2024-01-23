@@ -66,7 +66,7 @@ def createTable():
 def track_page_visit():
     try:
         if not metrics_initialised:
-            print("metrics_initialised="+metrics_initialised)
+            print("metrics_initialised=",metrics_initialised)
             initialise_metrics(1)
         if not app.config['table_created']:
             createTable()
