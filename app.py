@@ -65,7 +65,9 @@ def createTable():
 @app.route(BASE_URI + '/track', methods=['POST'])
 def track_page_visit():
     try:
-        initialise_metrics(1)
+        if not metrics_initialised:
+            print("metrics_initialised="+metrics_initialised)
+            initialise_metrics(1)
         if not app.config['table_created']:
             createTable()
 
