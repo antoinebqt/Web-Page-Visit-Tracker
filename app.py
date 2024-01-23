@@ -67,7 +67,6 @@ def track_page_visit():
     try:
         global metrics_initialised
         if not metrics_initialised:
-            print("metrics_initialised=", metrics_initialised)
             initialise_metrics(1)
         if not app.config['table_created']:
             createTable()
@@ -197,7 +196,6 @@ def is_client_exists(client_url):
 
 def initialise_metrics(timeToSleep=120):
     global metrics_initialised
-    print("initialise_metrics_method:",metrics_initialised)
     metrics_initialised=True
     time.sleep(timeToSleep)
     keys = page_counter_db.keys('*')
