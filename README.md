@@ -27,6 +27,6 @@ Il est aussi possible de consulter les données de journalisation via Kibana.
 
 ### Liens
 - Grafana: http://grafana.orch-team-a.pns-projects.fr.eu.org/ (user: admin, password: benochan)
-- Kibana : https://kibana.orch-team-a.pns-projects.fr.eu.org/
+- Kibana : https://kibana.orch-team-a.pns-projects.fr.eu.org/ (elastic, tC6p5O19C8hzjf1BN5c348rZ)
 - Argocd : http://argocd.orch-team-a.pns-projects.fr.eu.org/ (user: admin, password: 9y6LAsY5vbF-1Bhq)
 - Polymetrie : http://polymetrie-service.orch-team-a.pns-projects.fr.eu.org/
